@@ -1,0 +1,59 @@
+{
+  "name": "langchain-claude-project",
+  "version": "1.0.0",
+  "description": "LangChain with direct Claude (Anthropic) integration",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "cli": "tsx src/cli.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "docker:build": "docker build -t langchain-claude .",
+    "docker:run": "docker run --env-file .env langchain-claude",
+    "docker:dev": "docker-compose up --build",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "langchain",
+    "anthropic",
+    "claude",
+    "ai",
+    "llm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/anthropic": "^1.0.0",
+    "@langchain/core": "^1.0.2",
+    "@langchain/mcp-adapters": "^1.0.0",
+    "@types/express": "^5.0.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "langchain": "^1.0.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
+  }
+}

@@ -1,23 +1,25 @@
 #!/usr/bin/env sh
 
-# Dockerコンテナが起動しているか確認
+# Dockerコンテナが起動しているか確認（モノレポ構成対応）
+cd packages/agent || exit 1
+
 if ! docker-compose ps | grep -q "app.*Up"; then
   echo "⚠️  Dockerコンテナが起動していません。起動してから再度コミットしてください。"
-  echo "実行: docker-compose up -d"
+  echo "実行: cd packages/agent && docker-compose up -d"
   exit 1
 fi
 
 echo "🔍 Running linter..."
 docker-compose exec -T app pnpm lint || {
   echo "❌ リンターエラー: コードに問題があります"
-  echo "修正するには: pnpm lint --fix を実行してください"
+  echo "修正するには: pnpm run agent:lint:fix を実行してください"
   exit 1
 }
 
 echo "✨ Running formatter check..."
 docker-compose exec -T app npx prettier --check "src/**/*.{ts,js,json}" || {
   echo "❌ フォーマットエラー: ファイルがフォーマットされていません"
-  echo "修正するには: pnpm format を実行してください"
+  echo "修正するには: pnpm run agent:format を実行してください"
   exit 1
 }
 

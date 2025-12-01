@@ -1,9 +1,9 @@
 #!/opt/homebrew/opt/node/bin/node
 import * as cdk from 'aws-cdk-lib/core';
-import { CicdPipelineStack } from '../lib/cicd-pipeline-stack';
+import { AgentStack } from '../lib/agent-stack';
 
 const app = new cdk.App();
-new CicdPipelineStack(app, 'CicdPipelineStack', {
+new AgentStack(app, 'AgentStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
