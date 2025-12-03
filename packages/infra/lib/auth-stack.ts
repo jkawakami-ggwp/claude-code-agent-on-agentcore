@@ -19,6 +19,7 @@ export class AuthStack extends Stack {
     this.userPoolClient = new cognito.UserPoolClient(this, "UserPoolClient", {
       userPoolClientName: "LangChainAgentUserPoolClient",
       userPool: this.userPool,
+      generateSecret: true,
     });
   }
 }
