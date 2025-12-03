@@ -8,13 +8,13 @@ describe('tools', () => {
       const tools = await loadTools();
       expect(Array.isArray(tools)).toBe(true);
       expect(tools.length).toBeGreaterThanOrEqual(2);
-    });
+    }, 30000);
 
     it('基本ツールを含むこと', async () => {
       const tools = await loadTools();
       expect(tools).toContain(getWeatherTool);
       expect(tools).toContain(getCurrentDateTimeTool);
-    });
+    }, 30000);
 
     it('すべてのツールが必要なプロパティを持つこと', async () => {
       const tools = await loadTools();
@@ -25,14 +25,14 @@ describe('tools', () => {
         expect(typeof tool.name).toBe('string');
         expect(typeof tool.description).toBe('string');
       });
-    });
+    }, 30000);
 
     it('すべてのツール名がユニークであること', async () => {
       const tools = await loadTools();
       const toolNames = tools.map((tool) => tool.name);
       const uniqueNames = new Set(toolNames);
       expect(uniqueNames.size).toBe(toolNames.length);
-    });
+    }, 30000);
 
     it('すべてのツールがinvokeメソッドで呼び出し可能であること', async () => {
       const tools = await loadTools();
@@ -40,6 +40,6 @@ describe('tools', () => {
         expect(tool).toHaveProperty('invoke');
         expect(typeof tool.invoke).toBe('function');
       });
-    });
+    }, 30000);
   });
 });

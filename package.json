@@ -16,7 +16,7 @@
     "agent:docker:build": "cd packages/agent && docker compose build",
     "agent:docker:up": "cd packages/agent && docker compose up -d",
     "agent:docker:down": "cd packages/agent && docker compose down",
-    "infra:deploy": "cd packages/infra && cdk deploy",
-    "infra:destroy": "cd packages/infra && cdk destroy"
+    "infra:deploy": "cd packages/infra && cdk deploy --all",
+    "infra:destroy": "cd packages/infra && cdk destroy --all"
   }
 }
