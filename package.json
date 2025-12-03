@@ -17,6 +17,9 @@
     "agent:docker:up": "cd packages/agent && docker compose up -d",
     "agent:docker:down": "cd packages/agent && docker compose down",
     "infra:deploy": "cd packages/infra && cdk deploy --all",
-    "infra:destroy": "cd packages/infra && cdk destroy --all"
+    "infra:destroy": "cd packages/infra && cdk destroy --all",
+    "web:dev": "cd packages/web && pnpm dev",
+    "web:build": "cd packages/web && pnpm build",
+    "web:start": "cd packages/web && pnpm start"
   }
 }
