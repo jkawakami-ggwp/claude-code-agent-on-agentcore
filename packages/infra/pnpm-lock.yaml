@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@aws-cdk/aws-bedrock-agentcore-alpha':
-        specifier: 2.221.0-alpha.0
-        version: 2.221.0-alpha.0(aws-cdk-lib@2.221.0(constructs@10.4.3))(constructs@10.4.3)
+        specifier: 2.235.1-alpha.0
+        version: 2.235.1-alpha.0(@aws-cdk/aws-bedrock-alpha@2.235.1-alpha.0(aws-cdk-lib@2.235.1(constructs@10.4.3))(constructs@10.4.3))(aws-cdk-lib@2.235.1(constructs@10.4.3))(constructs@10.4.3)
       aws-cdk-lib:
-        specifier: 2.221.0
-        version: 2.221.0(constructs@10.4.3)
+        specifier: 2.235.1
+        version: 2.235.1(constructs@10.4.3)
       constructs:
         specifier: ^10.0.0
         version: 10.4.3
@@ -24,9 +24,6 @@ importers:
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
-      aws-cdk:
-        specifier: 2.1033.0
-        version: 2.1033.0
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@24.10.1)(ts-node@10.9.2(@types/node@24.10.1)(typescript@5.9.3))
@@ -42,17 +39,25 @@ importers:
 
 packages:
 
-  '@aws-cdk/asset-awscli-v1@2.2.242':
-    resolution: {integrity: sha512-4c1bAy2ISzcdKXYS1k4HYZsNrgiwbiDzj36ybwFVxEWZXVAP0dimQTCaB9fxu7sWzEjw3d+eaw6Fon+QTfTIpQ==}
+  '@aws-cdk/asset-awscli-v1@2.2.261':
+    resolution: {integrity: sha512-XkKvgG/OxrEYtVTt2Q9gaD58Qn90fnX/dNczL4k6myeii7UgAGPmqh+I+1uKohCWGKIKd+4Gz2xWBL/tPi4YIA==}
 
   '@aws-cdk/asset-node-proxy-agent-v6@2.1.0':
     resolution: {integrity: sha512-7bY3J8GCVxLupn/kNmpPc5VJz8grx+4RKfnnJiO1LG+uxkZfANZG3RMHhE+qQxxwkyQ9/MfPtTpf748UhR425A==}
 
-  '@aws-cdk/aws-bedrock-agentcore-alpha@2.221.0-alpha.0':
-    resolution: {integrity: sha512-QJpZoyOE6i70ABqeU6dW0PrSRfeg8Za9zeCINiaKLlznw58tUx9zxotmCajTyJMIMHEgpxsSP/SLaeuYprrp/Q==}
+  '@aws-cdk/aws-bedrock-agentcore-alpha@2.235.1-alpha.0':
+    resolution: {integrity: sha512-/rEcZgg9KUmwn/5u8msL68AAOR/i3LBk+DaWUh2FvU4S7jMeLWBo7PqkNLfUNABntfS7YVBSSbFyjynumLwSEQ==}
     engines: {node: '>= 18.0.0'}
     peerDependencies:
-      aws-cdk-lib: ^2.221.0
+      '@aws-cdk/aws-bedrock-alpha': 2.235.1-alpha.0
+      aws-cdk-lib: ^2.235.1
+      constructs: ^10.0.0
+
+  '@aws-cdk/aws-bedrock-alpha@2.235.1-alpha.0':
+    resolution: {integrity: sha512-re9HB3S43zqv1Ge/czIWR6KkUHS/dcSy0f3jjS43axMnq8kpIkQYkhne0PRsPtAmBr7Q+Om/KAzIeq6940oRfA==}
+    engines: {node: '>= 18.0.0'}
+    peerDependencies:
+      aws-cdk-lib: ^2.235.1
       constructs: ^10.0.0
 
   '@aws-cdk/cloud-assembly-schema@48.20.0':
@@ -419,8 +424,8 @@ packages:
   argparse@1.0.10:
     resolution: {integrity: sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==}
 
-  aws-cdk-lib@2.221.0:
-    resolution: {integrity: sha512-lOS0EnE4NQBW2+/0/qxwDBtGYGt8Fa/lCYsvC2/XTU3vBZ454mKkdI9zWKspZJ+Fo5b2iS1Q7iiSIbQVat2xJA==}
+  aws-cdk-lib@2.235.1:
+    resolution: {integrity: sha512-qKAsbunxtveIOIaeJSBgH2PZgdIiPkKtfsa+BxeNDOv2idw6Oa0dJW3Q0sdu8XBopY1KZI2Owrg8r56BOyyohA==}
     engines: {node: '>= 18.0.0'}
     peerDependencies:
       constructs: ^10.0.0
@@ -436,11 +441,6 @@ packages:
       - table
       - yaml
       - mime-types
-
-  aws-cdk@2.1033.0:
-    resolution: {integrity: sha512-Pit2k7cVAwxoYI7RMVsOyltuy7/HGENLupJ4KAm/d8mGzOfX+SLOo9YQsx5CKY9J6ErCZ1ViLerklTfjytvQww==}
-    engines: {node: '>= 18.0.0'}
-    hasBin: true
 
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
@@ -652,11 +652,6 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
-
-  fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -1301,13 +1296,19 @@ packages:
 
 snapshots:
 
-  '@aws-cdk/asset-awscli-v1@2.2.242': {}
+  '@aws-cdk/asset-awscli-v1@2.2.261': {}
 
   '@aws-cdk/asset-node-proxy-agent-v6@2.1.0': {}
 
-  '@aws-cdk/aws-bedrock-agentcore-alpha@2.221.0-alpha.0(aws-cdk-lib@2.221.0(constructs@10.4.3))(constructs@10.4.3)':
+  '@aws-cdk/aws-bedrock-agentcore-alpha@2.235.1-alpha.0(@aws-cdk/aws-bedrock-alpha@2.235.1-alpha.0(aws-cdk-lib@2.235.1(constructs@10.4.3))(constructs@10.4.3))(aws-cdk-lib@2.235.1(constructs@10.4.3))(constructs@10.4.3)':
     dependencies:
-      aws-cdk-lib: 2.221.0(constructs@10.4.3)
+      '@aws-cdk/aws-bedrock-alpha': 2.235.1-alpha.0(aws-cdk-lib@2.235.1(constructs@10.4.3))(constructs@10.4.3)
+      aws-cdk-lib: 2.235.1(constructs@10.4.3)
+      constructs: 10.4.3
+
+  '@aws-cdk/aws-bedrock-alpha@2.235.1-alpha.0(aws-cdk-lib@2.235.1(constructs@10.4.3))(constructs@10.4.3)':
+    dependencies:
+      aws-cdk-lib: 2.235.1(constructs@10.4.3)
       constructs: 10.4.3
 
   '@aws-cdk/cloud-assembly-schema@48.20.0': {}
@@ -1800,16 +1801,12 @@ snapshots:
     dependencies:
       sprintf-js: 1.0.3
 
-  aws-cdk-lib@2.221.0(constructs@10.4.3):
+  aws-cdk-lib@2.235.1(constructs@10.4.3):
     dependencies:
-      '@aws-cdk/asset-awscli-v1': 2.2.242
+      '@aws-cdk/asset-awscli-v1': 2.2.261
       '@aws-cdk/asset-node-proxy-agent-v6': 2.1.0
       '@aws-cdk/cloud-assembly-schema': 48.20.0
       constructs: 10.4.3
-
-  aws-cdk@2.1033.0:
-    optionalDependencies:
-      fsevents: 2.3.2
 
   babel-jest@29.7.0(@babel/core@7.28.5):
     dependencies:
@@ -2029,9 +2026,6 @@ snapshots:
       path-exists: 4.0.0
 
   fs.realpath@1.0.0: {}
-
-  fsevents@2.3.2:
-    optional: true
 
   fsevents@2.3.3:
     optional: true

@@ -16,6 +16,13 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
 
     const { userPool, userPoolClient } = props;
 
+    // Memory
+    const memory = new agentcore.Memory(this, "AgentMemory", {
+      memoryName: "claude_code_agent_memory",
+      description: "Claude Code Agent Memory",
+      expirationDuration: cdk.Duration.days(90),
+    });
+
     // Agent Runtime Artifact (Docker ビルド)
     const agentRuntimeArtifact = agentcore.AgentRuntimeArtifact.fromAsset(
       path.join(__dirname, "../../agent")
@@ -27,8 +34,8 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
       agentRuntimeArtifact,
       description: "Claude Code Agent",
       authorizerConfiguration: agentcore.RuntimeAuthorizerConfiguration.usingCognito(
-        userPool.userPoolId,
-        userPoolClient.userPoolClientId,
+        userPool,
+        [userPoolClient],
       ),
       environmentVariables: {
         // Secret Managerから取得
@@ -37,6 +44,7 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
           "ClaudeCodeAgentAnthropicApiKey",
           "claude-code-agent/anthropic-api-key"
         ).secretValue.unsafeUnwrap(),
+        MEMORY_ID: memory.memoryId,
       },
     });
   }
