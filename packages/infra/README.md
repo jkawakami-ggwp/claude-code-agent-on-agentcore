@@ -1,55 +1,34 @@
-# CDK Infrastructure for ts-langchain-agent
+# Infrastructure (AWS CDK)
 
-このディレクトリには、CI/CD パイプライン（CodePipeline + CodeBuild + ECR）を構築する CDK コードが含まれています。
+AWS Bedrock Agent と Cognito 認証を使用したエージェントのインフラストラクチャ。
 
-## セットアップ
+## スタック構成
 
-### 1. 依存関係のインストール
+- **AuthStack**: Cognito User Pool と OAuth 設定
+- **AgentStack**: Bedrock Agent Runtime (Docker コンテナ)
 
-```bash
-npm install
-```
-
-### 2. コンテキスト設定ファイルの作成
-
-`cdk.context.json.example` をコピーして `cdk.context.json` を作成し、実際の値を設定してください：
+## デプロイ
 
 ```bash
-cp cdk.context.json.example cdk.context.json
+# 依存関係のインストール
+pnpm install
+
+# デプロイ
+npx cdk deploy --all
 ```
 
-`cdk.context.json` に以下の値を設定：
+## 環境変数（任意）
 
-- `appUrl`: アプリケーションのURL（任意、デフォルト: `http://localhost:3000`）
-- `callbackPath`: OAuth コールバックパス（任意、デフォルト: `/api/auth/callback/cognito`）
-
-### 3. 環境変数の設定（任意）
-
-`cdk.context.json` の代わりに、環境変数で設定することもできます：
+デフォルトは `http://localhost:3000` です。本番環境では以下を設定してください：
 
 ```bash
 export APP_URL=https://your-app-domain.com
 export CALLBACK_PATH=/api/auth/callback/cognito
 ```
 
-これらは設定しない場合、デフォルト値（`http://localhost:3000`）が使用されます。
+## コマンド
 
-### 4. デプロイ
-
-```bash
-npx cdk deploy
-```
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
-
-## セキュリティ
-
-`cdk.context.json` には機密情報（AWS リソース ARN など）が含まれるため、Git リポジトリにはコミットしないでください。
-このファイルは `.gitignore` で除外されています。
+- `npx cdk deploy --all` - すべてのスタックをデプロイ
+- `npx cdk diff` - 変更内容を確認
+- `npx cdk synth` - CloudFormation テンプレートを生成
+- `npx cdk destroy --all` - すべてのスタックを削除

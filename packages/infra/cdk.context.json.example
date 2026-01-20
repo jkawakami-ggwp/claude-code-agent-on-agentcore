@@ -1,4 +1,0 @@
-{
-  "appUrl": "https://your-app-domain.com",
-  "callbackPath": "/api/auth/callback/cognito"
-}

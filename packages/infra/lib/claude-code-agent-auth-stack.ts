@@ -2,7 +2,7 @@ import { Stack, StackProps, CfnOutput } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 
-export class AuthStack extends Stack {
+export class ClaudeCodeAgentAuthStack extends Stack {
   public readonly userPool: cognito.UserPool;
   public readonly userPoolClient: cognito.UserPoolClient;
   public readonly userPoolDomain: cognito.UserPoolDomain;
@@ -18,7 +18,7 @@ export class AuthStack extends Stack {
     // Cognito User Pool
     this.userPool = new cognito.UserPool(this, "UserPool", {
       // User Poolの名前（任意、デフォルト: 自動生成）
-      userPoolName: "LangChainAgentUserPool",
+      userPoolName: "ClaudeCodeAgentUserPool",
 
       // サインインに使用する識別子（任意、デフォルト: username）
       // email: メールアドレスでサインイン可能
@@ -52,14 +52,14 @@ export class AuthStack extends Stack {
     // Cognito User Pool Domain (必須: OAuth用)
     this.userPoolDomain = this.userPool.addDomain("UserPoolDomain", {
       cognitoDomain: {
-        domainPrefix: `langchain-agent-${this.account}`,
+        domainPrefix: `claude-code-agent-${this.account}`,
       },
     });
 
     // Cognito User Pool Client
     this.userPoolClient = new cognito.UserPoolClient(this, "UserPoolClient", {
       // クライアント名（任意、デフォルト: 自動生成）
-      userPoolClientName: "LangChainAgentUserPoolClient",
+      userPoolClientName: "ClaudeCodeAgentUserPoolClient",
 
       // 関連付けるUser Pool（必須）
       userPool: this.userPool,

@@ -1,7 +1,7 @@
 #!/opt/homebrew/opt/node/bin/node
 import * as cdk from "aws-cdk-lib";
-import { AuthStack } from "../lib/auth-stack";
-import { AgentStack } from "../lib/agent-stack";
+import { ClaudeCodeAgentAuthStack } from "../lib/claude-code-agent-auth-stack";
+import { ClaudeCodeAgentStack } from "../lib/claude-code-agent-stack";
 
 const app = new cdk.App();
 
@@ -10,14 +10,14 @@ const env: cdk.Environment = {
   region: process.env.CDK_DEFAULT_REGION ?? "ap-northeast-1",
 };
 
-const authStack = new AuthStack(app, "AuthStack", { env });
+const authStack = new ClaudeCodeAgentAuthStack(app, "ClaudeCodeAgentAuthStack", { env });
 
 const sharedAuthResources = {
   userPool: authStack.userPool,
   userPoolClient: authStack.userPoolClient,
 };
 
-new AgentStack(app, "AgentStack", {
+new ClaudeCodeAgentStack(app, "ClaudeCodeAgentStack", {
   env,
   ...sharedAuthResources,
 });

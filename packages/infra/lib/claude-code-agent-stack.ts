@@ -9,7 +9,7 @@ interface AgentStackProps extends cdk.StackProps {
   userPoolClient: cognito.UserPoolClient;
 }
 
-export class AgentStack extends cdk.Stack {
+export class ClaudeCodeAgentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: AgentStackProps) {
     super(scope, id, props);
 
@@ -20,11 +20,11 @@ export class AgentStack extends cdk.Stack {
       path.join(__dirname, "../../agent")
     );
 
-    // Runtime (LangChain Agent)
+    // Runtime (Claude Code Agent)
     const runtime = new agentcore.Runtime(this, "AgentRuntime", {
-      runtimeName: "LangChainAgent",
+      runtimeName: "ClaudeCodeAgent",
       agentRuntimeArtifact,
-      description: "LangChain Agent with tools",
+      description: "Claude Code Agent",
       authorizerConfiguration: agentcore.RuntimeAuthorizerConfiguration.usingCognito(
         userPool.userPoolId,
         userPoolClient.userPoolClientId,
