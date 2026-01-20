@@ -1,6 +1,7 @@
 # Web Application
 
-NextAuth.js と AWS Cognito を使用した認証機能を持つ Next.js アプリケーションです。
+AWS Bedrock Agent Core にデプロイされた Claude Code Agent と対話できる Next.js アプリケーションです。
+NextAuth.js と AWS Cognito を使用した認証機能を持ちます。
 
 ## 目次
 
@@ -14,11 +15,12 @@ NextAuth.js と AWS Cognito を使用した認証機能を持つ Next.js アプ�
 
 ## 機能
 
+- **Agent チャット**: AWS Bedrock Agent Core にデプロイされた Claude Code Agent との対話
 - **認証**: AWS Cognito による OAuth 2.0 認証
 - **セッション管理**: NextAuth.js によるセッション管理
 - **TypeScript**: 完全な型安全性
 - **Tailwind CSS**: モダンなUIデザイン
-- **Server Components**: Next.js 14+ の App Router に対応
+- **Server Components**: Next.js の App Router に対応
 
 ## セットアップ手順
 
@@ -39,20 +41,18 @@ pnpm install
 pnpm cdk bootstrap
 ```
 
-#### 1.2 AuthStack のデプロイ
+#### 1.2 ClaudeCodeAgentAuthStack のデプロイ
 
 ```bash
-pnpm cdk deploy AuthStack
+pnpm cdk deploy ClaudeCodeAgentAuthStack
 ```
 
 デプロイが完了すると、以下の情報が出力されます：
 
 ```
 Outputs:
-AuthStack.UserPoolId = ap-northeast-1_XXXXXXXXX
-AuthStack.UserPoolClientId = xxxxxxxxxxxxxxxxxxxx
-AuthStack.CognitoIssuer = https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_XXXXXXXXX
-AuthStack.CognitoDomain = langchain-agent-123456789012
+ClaudeCodeAgentAuthStack.UserPoolClientId = xxxxxxxxxxxxxxxxxxxx
+ClaudeCodeAgentAuthStack.CognitoIssuer = https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_XXXXXXXXX
 ```
 
 これらの値をメモしておいてください。
@@ -118,6 +118,7 @@ NEXTAUTH_SECRET=<openssl rand -base64 32 で生成>
 COGNITO_CLIENT_ID=<UserPoolClientId>
 COGNITO_CLIENT_SECRET=<Client Secret>
 COGNITO_ISSUER=<CognitoIssuer>
+AGENT_CORE_API_URL=<Agent CoreのAPIエンドポイント>
 ```
 
 #### NEXTAUTH_SECRET の生成
@@ -129,6 +130,17 @@ openssl rand -base64 32
 ```
 
 生成された文字列を `NEXTAUTH_SECRET` に設定してください。
+
+#### AGENT_CORE_API_URL の取得
+
+Agent Core の API エンドポイントは、`packages/infra` で Agent Stack をデプロイした際の出力から取得できます。
+
+```bash
+cd packages/infra
+pnpm cdk deploy ClaudeCodeAgentStack
+```
+
+デプロイ完了後、出力される API エンドポイントの URL を `AGENT_CORE_API_URL` に設定してください。
 
 ### 5. アプリケーションの起動
 
@@ -145,6 +157,8 @@ pnpm dev
 packages/web/
 ├── app/                      # Next.js App Router
 │   ├── api/
+│   │   ├── agent/
+│   │   │   └── invoke/         # Agent呼び出しAPI
 │   │   ├── auth/
 │   │   │   └── [...nextauth]/  # NextAuth.js API routes
 │   │   └── protected/          # 保護されたAPI例
@@ -152,19 +166,34 @@ packages/web/
 │   │   ├── signin/             # カスタムサインインページ
 │   │   └── error/              # 認証エラーページ
 │   ├── layout.tsx              # ルートレイアウト
-│   └── page.tsx                # ホームページ
+│   └── page.tsx                # ホームページ（Agentチャット）
 ├── components/
+│   ├── agent/                  # Agent関連コンポーネント
+│   │   └── AgentChat.tsx       # Agentチャットインターフェース
 │   ├── auth/                   # 認証関連コンポーネント
-│   │   ├── LoginButton.tsx
-│   │   └── AccessToken.tsx
+│   │   └── LoginButton.tsx
+│   ├── layout/                 # レイアウトコンポーネント
+│   │   └── Header.tsx          # ヘッダー（認証状態表示）
 │   └── providers/              # React Context Providers
 │       └── SessionProvider.tsx
-├── lib/                        # ユーティリティ関数
 └── types/                      # TypeScript型定義
     └── next-auth.d.ts         # NextAuth型拡張
 ```
 
 ## 実装されている機能
+
+### Agent チャット機能
+
+- **Agent Chat UI** (`/components/agent/AgentChat.tsx`)
+  - AWS Bedrock Agent Core にデプロイされた Claude Code Agent との対話インターフェース
+  - リアルタイムメッセージング
+  - メッセージ履歴の表示
+  - ローディング状態とエラーハンドリング
+
+- **Agent API** (`/app/api/agent/invoke/route.ts`)
+  - Agent Core へのプロキシAPI
+  - 認証済みユーザーのみアクセス可能
+  - Bearer Token（Cognito Access Token）を使用した認証
 
 ### 認証API
 
@@ -172,23 +201,26 @@ packages/web/
   - NextAuth.js の設定とハンドラー
   - Cognito Provider の設定
   - JWT と Session のカスタムコールバック
+  - Access Token の保存と管理
 
 ### コンポーネント
 
-1. **NextAuthProvider** (`/components/providers/SessionProvider.tsx`)
+1. **Header** (`/components/layout/Header.tsx`)
+   - ヘッダーコンポーネント
+   - サインイン/サインアウトボタン
+   - ユーザー情報表示
+
+2. **NextAuthProvider** (`/components/providers/SessionProvider.tsx`)
    - セッション状態を管理するプロバイダー
    - クライアントコンポーネントとしてラップ
 
-2. **LoginButton** (`/components/auth/LoginButton.tsx`)
+3. **LoginButton** (`/components/auth/LoginButton.tsx`)
    - サインイン/サインアウトボタン
    - セッション状態の表示
 
-3. **AccessToken** (`/components/auth/AccessToken.tsx`)
-   - アクセストークンの表示（ログイン時のみ）
-
 ### ページ
 
-- `app/page.tsx`: ホームページ
+- `app/page.tsx`: ホームページ（Agent チャットインターフェース）
 - `app/auth/signin/page.tsx`: カスタムサインインページ
 - `app/auth/error/page.tsx`: 認証エラーページ
 
@@ -205,6 +237,40 @@ packages/web/
   - カスタムプロパティ（accessToken）の追加
 
 ## 使い方
+
+### Agent チャットの使い方
+
+1. アプリケーションにアクセス
+2. ヘッダーの「サインイン」ボタンをクリック
+3. Cognito Hosted UI でログイン
+4. ホームページに戻ると、Agent チャットインターフェースが表示される
+5. テキストボックスにメッセージを入力して「Send」をクリック
+6. Agent からの応答が表示される
+
+#### Agent に質問できる内容
+
+- 現在の日時の取得
+- 天気情報の取得
+- その他、Agent に実装されている機能
+
+### Agent API の使い方
+
+Agent API を直接呼び出すこともできます：
+
+```typescript
+const response = await fetch("/api/agent/invoke", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    message: "今日の天気を教えて",
+  }),
+});
+
+const data = await response.json();
+console.log(data.output); // Agent の応答
+```
 
 ### クライアントサイドでのセッション取得
 
@@ -258,12 +324,24 @@ import { signIn, signOut } from "next-auth/react";
 
 このアプリケーションは AWS Cognito を使用して認証を行います：
 
-1. ユーザーが「Sign in」ボタンをクリック
+1. ユーザーがヘッダーの「サインイン」ボタンをクリック
 2. カスタムサインインページ（`/auth/signin`）が表示される
 3. 「Sign in with Cognito」をクリックすると、Cognito Hosted UI にリダイレクト
 4. ユーザーがCognitoでログイン（メールアドレス/パスワード）
 5. 認証成功後、コールバックURL（`/api/auth/callback/cognito`）経由でアプリに戻る
-6. NextAuth.jsがセッションを作成し、ユーザーは認証済み状態に
+6. NextAuth.jsがセッションを作成し、Access Token を保存
+7. ユーザーは認証済み状態となり、Agent チャットが利用可能に
+
+## Agent 呼び出しフロー
+
+Agent への問い合わせは以下の流れで処理されます：
+
+1. ユーザーがチャットインターフェースでメッセージを入力
+2. フロントエンド（`AgentChat.tsx`）が `/api/agent/invoke` API にリクエスト
+3. API（`route.ts`）がセッションから Access Token を取得
+4. Access Token を Bearer Token として Agent Core API にリクエスト
+5. Agent Core が Claude モデルを使用してレスポンスを生成
+6. レスポンスがフロントエンドに返され、チャットに表示される
 
 ## AWS Cognito の設定詳細
 
@@ -272,39 +350,42 @@ import { signIn, signOut } from "next-auth/react";
 このプロジェクトのCognito User Poolは以下の設定で構成されています：
 
 - **サインイン方法**: メールアドレス
-- **自己登録**: 有効
+- **自己登録**: 無効（管理者によるユーザー作成のみ）
 - **メール検証**: 自動
 - **パスワードポリシー**: 
   - 最小8文字
-  - 大文字、小文字、数字、記号を含む
+  - 小文字必須
+  - 大文字、数字、記号は任意
 - **OAuth フロー**: Authorization Code Grant
 - **OAuth スコープ**: email, openid, profile
 
 ### Callback URL の更新
 
-本番環境にデプロイする際は、`packages/infra/lib/auth-stack.ts` の `callbackUrls` を更新してください：
-
-```typescript
-callbackUrls: [
-  "http://localhost:3000/api/auth/callback/cognito",
-  "https://your-production-domain.com/api/auth/callback/cognito",
-],
-logoutUrls: [
-  "http://localhost:3000",
-  "https://your-production-domain.com",
-],
-```
-
-その後、CDKを再デプロイします：
+本番環境にデプロイする際は、環境変数 `APP_URL` と `CALLBACK_PATH` を設定してデプロイしてください：
 
 ```bash
 cd packages/infra
-pnpm cdk deploy AuthStack
+# 本番環境のURLを指定
+export APP_URL=https://your-production-domain.com
+export CALLBACK_PATH=/api/auth/callback/cognito
+pnpm cdk deploy ClaudeCodeAgentAuthStack
+```
+
+または、`packages/infra/lib/claude-code-agent-auth-stack.ts` のデフォルト値を直接編集することもできます：
+
+```typescript
+const appUrl = process.env.APP_URL || "https://your-production-domain.com";
+const callbackPath = process.env.CALLBACK_PATH || "/api/auth/callback/cognito";
 ```
 
 ## 開発
 
+### ローカル開発の起動
+
 ```bash
+# 依存関係のインストール
+pnpm install
+
 # 開発サーバーの起動
 pnpm dev
 
@@ -316,6 +397,21 @@ pnpm start
 
 # リンター実行
 pnpm lint
+```
+
+### 注意事項
+
+このプロジェクトでは、パッケージマネージャーとして **pnpm を使用** しています。
+`npm` や `yarn` は使用しないでください。
+
+Docker コンテナを使用している場合は、以下のようにコンテナ内でコマンドを実行します：
+
+```bash
+# 開発サーバーの起動（コンテナ内）
+docker-compose exec app pnpm dev
+
+# 依存関係のインストール（コンテナ内）
+docker-compose exec app pnpm install
 ```
 
 ## 環境変数
@@ -331,6 +427,9 @@ NEXTAUTH_SECRET=<generated-secret>
 COGNITO_CLIENT_ID=<your-client-id>
 COGNITO_CLIENT_SECRET=<your-client-secret>
 COGNITO_ISSUER=https://cognito-idp.{region}.amazonaws.com/{UserPoolId}
+
+# Agent Core API
+AGENT_CORE_API_URL=<agent-core-api-endpoint>
 ```
 
 ## デプロイ
@@ -352,25 +451,12 @@ vercel link
 
 まず、本番環境のURLを確認します（例: `https://your-app.vercel.app`）
 
-CDK のコードを更新：
-
-```typescript
-// packages/infra/lib/auth-stack.ts
-callbackUrls: [
-  "http://localhost:3000/api/auth/callback/cognito",
-  "https://your-app.vercel.app/api/auth/callback/cognito", // 追加
-],
-logoutUrls: [
-  "http://localhost:3000",
-  "https://your-app.vercel.app", // 追加
-],
-```
-
-AuthStack を再デプロイ：
+環境変数を設定して ClaudeCodeAgentAuthStack を再デプロイ：
 
 ```bash
 cd packages/infra
-pnpm cdk deploy AuthStack
+export APP_URL=https://your-app.vercel.app
+pnpm cdk deploy ClaudeCodeAgentAuthStack
 ```
 
 #### 3. Vercel の環境変数を設定
@@ -383,6 +469,7 @@ NEXTAUTH_SECRET=<本番用のシークレット>
 COGNITO_CLIENT_ID=<UserPoolClientId>
 COGNITO_CLIENT_SECRET=<Client Secret>
 COGNITO_ISSUER=<CognitoIssuer>
+AGENT_CORE_API_URL=<Agent CoreのAPIエンドポイント>
 ```
 
 または CLI から設定：
@@ -393,6 +480,7 @@ vercel env add NEXTAUTH_SECRET production
 vercel env add COGNITO_CLIENT_ID production
 vercel env add COGNITO_CLIENT_SECRET production
 vercel env add COGNITO_ISSUER production
+vercel env add AGENT_CORE_API_URL production
 ```
 
 #### 4. デプロイ
@@ -451,14 +539,15 @@ CMD ["node", "server.js"]
 ビルドと実行：
 
 ```bash
-docker build -t nextauth-app .
+docker build -t claude-code-agent-app .
 docker run -p 3000:3000 \
   -e NEXTAUTH_URL=https://your-domain.com \
   -e NEXTAUTH_SECRET=<secret> \
   -e COGNITO_CLIENT_ID=<client-id> \
   -e COGNITO_CLIENT_SECRET=<client-secret> \
   -e COGNITO_ISSUER=<issuer> \
-  nextauth-app
+  -e AGENT_CORE_API_URL=<agent-core-api-endpoint> \
+  claude-code-agent-app
 ```
 
 ### デプロイ後の動作確認
@@ -519,6 +608,22 @@ CDKでデプロイした直後は、Client Secretが出力に含まれません�
 - ユーザーが正しく作成されたか確認
 - メールアドレスが検証済みか確認（`email_verified=true`）
 
+### Agent API エラー
+
+**エラー**: `Agent Core API URL is not configured`
+
+**解決策**:
+- `.env.local` に `AGENT_CORE_API_URL` が設定されているか確認
+- 環境変数を追加した後、開発サーバーを再起動
+
+**エラー**: `Failed to invoke agent` / `401 Unauthorized`
+
+**解決策**:
+- サインインしているか確認
+- Access Token が正しく取得されているか確認
+- Agent Core API のエンドポイントが正しいか確認
+- Agent Core API の認証設定を確認
+
 ## セキュリティのベストプラクティス
 
 1. **NEXTAUTH_SECRET の管理**
@@ -573,12 +678,24 @@ NEXTAUTH_DEBUG=true
 
 ## 参考リンク
 
+### Agent 関連
+- [AWS Bedrock Documentation](https://docs.aws.amazon.com/bedrock/)
+- [AWS Bedrock Agent Core Documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html)
+- [LangChain Documentation](https://js.langchain.com/)
+
+### 認証関連
 - [NextAuth.js Documentation](https://next-auth.js.org)
 - [NextAuth.js Cognito Provider](https://next-auth.js.org/providers/cognito)
 - [NextAuth.js Deployment](https://next-auth.js.org/deployment)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Vercel Deployment Guide](https://vercel.com/docs/deployments/overview)
 - [AWS Cognito Documentation](https://docs.aws.amazon.com/cognito/)
 - [AWS CDK Cognito Documentation](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_cognito-readme.html)
-- [AWS CDK Best Practices](https://docs.aws.amazon.com/cdk/v2/guide/best-practices.html)
 - [AWS Cognito Security Best Practices](https://docs.aws.amazon.com/cognito/latest/developerguide/security-best-practices.html)
+
+### フロントエンド関連
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [React Documentation](https://react.dev)
+
+### デプロイ関連
+- [Vercel Deployment Guide](https://vercel.com/docs/deployments/overview)
+- [AWS CDK Best Practices](https://docs.aws.amazon.com/cdk/v2/guide/best-practices.html)
