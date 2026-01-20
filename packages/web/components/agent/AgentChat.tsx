@@ -88,7 +88,7 @@ export default function AgentChat() {
     <div className="w-full max-w-3xl mx-auto p-4 space-y-4">
       <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-zinc-50">
-          LangChain Agent
+          Claude Code Agent
         </h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
           Ask me anything! I can help you with weather information, current date

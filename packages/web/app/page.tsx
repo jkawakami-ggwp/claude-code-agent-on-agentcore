@@ -19,10 +19,10 @@ export default function Home() {
         </div>
         <div className="flex flex-col items-center gap-6 text-center w-full mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-black dark:text-zinc-50">
-            LangChain Agent with AWS Bedrock
+            Claude Code Agent with AWS Bedrock
           </h1>
           <p className="max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            AWS Bedrock Agent Coreにデプロイされた LangChain エージェントと対話できます。
+            AWS Bedrock Agent Coreにデプロイされた Claude Code Agentと対話できます。
             ログインして、エージェントに質問してみましょう。
           </p>
           <div className="mt-4 w-full max-w-md">
