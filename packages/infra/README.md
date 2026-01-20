@@ -7,6 +7,27 @@ AWS Bedrock Agent と Cognito 認証を使用したエージェントのイン�
 - **AuthStack**: Cognito User Pool と OAuth 設定
 - **AgentStack**: Bedrock Agent Runtime (Docker コンテナ)
 
+## 事前準備
+
+### 必須：シークレットの設定
+
+デプロイ前に、AWS Secrets Managerで以下のシークレットを作成する必要があります：
+
+```bash
+# Anthropic API Key の設定
+aws secretsmanager create-secret \
+  --name claude-code-agent/anthropic-api-key \
+  --secret-string "your-anthropic-api-key-here"
+```
+
+または、AWS Management Consoleから作成：
+1. AWS Secrets Manager コンソールを開く
+2. 「新しいシークレットを保存」をクリック
+3. シークレットタイプ：「その他のシークレット」
+4. キー/値：
+   - プレーンテキストタブで直接APIキーを入力
+5. シークレット名：`claude-code-agent/anthropic-api-key`
+
 ## デプロイ
 
 ```bash

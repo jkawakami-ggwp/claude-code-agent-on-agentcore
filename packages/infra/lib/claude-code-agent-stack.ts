@@ -3,6 +3,7 @@ import * as path from "path";
 import { Construct } from "constructs";
 import * as agentcore from "@aws-cdk/aws-bedrock-agentcore-alpha";
 import * as cognito from "aws-cdk-lib/aws-cognito";
+import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 
 interface AgentStackProps extends cdk.StackProps {
   userPool: cognito.UserPool;
@@ -30,10 +31,12 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
         userPoolClient.userPoolClientId,
       ),
       environmentVariables: {
-        // TODO: Runtime Environment Variables を 設定する
-        ANTHROPIC_API_KEY: "",
-        CLAUDE_MODEL: "",
-        NODE_ENV: "",
+        // Secret Managerから取得
+        ANTHROPIC_API_KEY: secretsmanager.Secret.fromSecretNameV2(
+          this,
+          "ClaudeCodeAgentAnthropicApiKey",
+          "claude-code-agent/anthropic-api-key"
+        ).secretValue.unsafeUnwrap(),
       },
     });
   }
