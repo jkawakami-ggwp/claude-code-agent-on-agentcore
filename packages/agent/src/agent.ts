@@ -1,73 +1,36 @@
-import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
-import { createAgent } from 'langchain';
-import type { StructuredToolInterface } from '@langchain/core/tools';
-import type { BaseMessage } from '@langchain/core/messages';
+import { query } from '@anthropic-ai/claude-agent-sdk';
 
 /**
- * エージェントの設定オプション
- */
-export interface AgentConfig {
-  /** 使用するClaudeモデル名 */
-  model: string;
-  /** 使用するツールの配列 */
-  tools: StructuredToolInterface[];
-}
-
-/**
- * エージェントの応答
- */
-export interface AgentResponse {
-  /** 応答テキスト */
-  content: string;
-  /** すべてのメッセージ履歴 */
-  messages: BaseMessage[];
-}
-
-/**
- * LangChainエージェントをラップするクラス
+ * Claude Code Agentをラップするクラス
  * メッセージの管理、エージェントの実行を簡素化
  */
 export class Agent {
-  private readonly model: string;
-  private readonly systemMessage =
-    'あなたは親切なAIアシスタントです。適切なツールを使用して回答してください。';
-  private readonly tools: StructuredToolInterface[];
-
-  constructor(config: AgentConfig) {
-    this.model = config.model;
-    this.tools = config.tools;
-  }
-
   /**
    * ユーザーメッセージを送信してエージェントから応答を取得
-   * @param message ユーザーメッセージ
-   * @returns エージェントの応答
+   * @param prompt ユーザーメッセージ
+   * @returns エージェントの応答テキスト
    */
-  async invoke(message: string): Promise<AgentResponse> {
-    const agent = createAgent({
-      model: this.model,
-      tools: this.tools,
-    });
+  async invoke(prompt: string): Promise<string> {
+    console.log('[Agent] prompt:', { prompt });
 
-    console.log('[Agent] invoke request:', { model: this.model, message });
+    let response = '';
+    for await (const message of query({
+      prompt: prompt,
+      options: { allowedTools: [] },
+    })) {
+      console.log('[Agent] message:', message);
 
-    const response = await agent.invoke({
-      messages: [new SystemMessage(this.systemMessage), new HumanMessage(message)],
-    });
+      // 結果メッセージのみを処理
+      if (message.type !== 'result') continue;
 
-    // 最後のAIメッセージを取得
-    const lastAiMessage = [...response.messages]
-      .reverse()
-      .find((msg) => msg.constructor.name === 'AIMessage') as AIMessage | undefined;
+      // 成功時のみresultプロパティが存在する
+      if (message.subtype === 'success') {
+        response = message.result;
+      } else {
+        throw new Error(message.errors.join(', '));
+      }
+    }
 
-    console.log('[Agent] invoke response:', {
-      content: lastAiMessage?.content ?? '',
-      totalMessages: response.messages.length,
-    });
-
-    return {
-      content: (lastAiMessage?.content as string) || '',
-      messages: response.messages,
-    };
+    return response;
   }
 }

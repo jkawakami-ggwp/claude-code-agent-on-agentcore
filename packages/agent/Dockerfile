@@ -4,13 +4,21 @@ FROM node:20-alpine
 # 作業ディレクトリを設定
 WORKDIR /app
 
+# pnpmのホームディレクトリを設定
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN mkdir -p $PNPM_HOME
+
 # pnpmをグローバルにインストール
 RUN npm install -g pnpm
+
+# Claude Codeをインストール
+RUN pnpm add -g @anthropic-ai/claude-code
 
 # パッケージファイルをコピー
 COPY package.json pnpm-lock.yaml* ./
 
-# 依存関係をインストール（開発用）
+# 依存関係をインストール
 RUN pnpm install
 
 # ソースコードをコピー

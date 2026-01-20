@@ -1,7 +1,6 @@
 import { config as loadEnv } from 'dotenv';
 import express, { Request, Response } from 'express';
 import { Agent } from './agent';
-import { loadTools } from './tools';
 
 loadEnv();
 
@@ -15,7 +14,7 @@ app.get('/ping', (_req: Request, res: Response) => {
 
 // AIエージェントを呼び出すエンドポイント（AWS Bedrock AgentCore要件に準拠）
 app.post('/invocations', async (req: Request, res: Response): Promise<void> => {
-  const { prompt } = req.body;
+  const { prompt } = req.body as { prompt?: string };
 
   if (!prompt) {
     res.status(400).json({
@@ -26,20 +25,14 @@ app.post('/invocations', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // ツールを読み込み
-    const tools = await loadTools();
-
     // Agentクラスのインスタンスを作成
-    const agent = new Agent({
-      model: process.env['CLAUDE_MODEL'] as string,
-      tools,
-    });
+    const agent = new Agent();
 
     // エージェントにメッセージを送信して応答を取得
     const response = await agent.invoke(prompt);
 
     // 応答を返す（AWS Bedrock AgentCore形式）
-    if (!response.content) {
+    if (!response) {
       res.json({
         response: '(応答なし)',
         status: 'success',
@@ -48,7 +41,7 @@ app.post('/invocations', async (req: Request, res: Response): Promise<void> => {
     }
 
     res.json({
-      response: response.content,
+      response: response,
       status: 'success',
     });
   } catch (error) {
