@@ -14,7 +14,11 @@ app.get('/ping', (_req: Request, res: Response) => {
 
 // AIエージェントを呼び出すエンドポイント（AWS Bedrock AgentCore要件に準拠）
 app.post('/invocations', async (req: Request, res: Response): Promise<void> => {
-  const { prompt } = req.body as { prompt?: string };
+  const { prompt, actorId, sessionId } = req.body as {
+    prompt?: string;
+    actorId?: string;
+    sessionId?: string;
+  };
 
   if (!prompt) {
     res.status(400).json({
@@ -25,17 +29,22 @@ app.post('/invocations', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
+    const resolvedActorId = actorId?.trim() ? actorId.trim() : 'anonymous';
+    const resolvedSessionId = sessionId?.trim() ? sessionId.trim() : crypto.randomUUID();
+
     // Agentクラスのインスタンスを作成
     const agent = new Agent();
 
     // エージェントにメッセージを送信して応答を取得
-    const response = await agent.invoke(prompt);
+    const response = await agent.invoke(prompt, resolvedActorId, resolvedSessionId);
 
     // 応答を返す（AWS Bedrock AgentCore形式）
     if (!response) {
       res.json({
         response: '(応答なし)',
         status: 'success',
+        actorId: resolvedActorId,
+        sessionId: resolvedSessionId,
       });
       return;
     }
@@ -43,6 +52,8 @@ app.post('/invocations', async (req: Request, res: Response): Promise<void> => {
     res.json({
       response: response,
       status: 'success',
+      actorId: resolvedActorId,
+      sessionId: resolvedSessionId,
     });
   } catch (error) {
     console.error('エラーが発生しました:', error);

@@ -15,6 +15,8 @@ export default function AgentChat() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [actorId, setActorId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +44,7 @@ export default function AgentChat() {
         },
         body: JSON.stringify({
           message: userMessage.content,
+          sessionId,
         }),
       });
 
@@ -51,6 +54,8 @@ export default function AgentChat() {
       }
 
       const data = await response.json();
+      if (typeof data.actorId === "string") setActorId(data.actorId);
+      if (typeof data.sessionId === "string") setSessionId(data.sessionId);
       const assistantMessage: Message = {
         role: "assistant",
         content: data.output || data.response || "No response from agent",
@@ -93,7 +98,11 @@ export default function AgentChat() {
         <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
           Ask me anything! I can help you with weather information, current date
           and time, and more.
-        </p>
+        </p>  
+        <div className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+          <div>actorId: {actorId}</div>
+          <div>sessionId: {sessionId}</div>
+        </div>
 
         {/* メッセージ履歴 */}
         <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">

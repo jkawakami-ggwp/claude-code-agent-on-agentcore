@@ -39,16 +39,23 @@ export class Agent {
   /**
    * ユーザーメッセージを送信してエージェントから応答を取得
    * @param prompt ユーザーメッセージ
+   * @param actorId 会話の主体を識別するID
+   * @param sessionId 会話セッションを識別するID
    * @returns エージェントの応答テキスト
    */
-  async invoke(prompt: string): Promise<string> {
+  async invoke(prompt: string, actorId?: string, sessionId?: string): Promise<string> {
+    console.log('[Agent] params:', { prompt, actorId, sessionId });
+
     const memory = new Memory();
-    console.log('[Agent] prompt:', { prompt });
+
+    // actorId と sessionId がない場合はエラー
+    if (!actorId) throw new Error('actorId は必要です');
+    if (!sessionId) throw new Error('sessionId は必要です');
 
     // メモリからイベントを取得
     const events = await memory.listEvents({
-      actorId: 'test',
-      sessionId: 'session2',
+      actorId: actorId,
+      sessionId: sessionId,
       maxResults: 20,
     });
 
@@ -71,8 +78,8 @@ export class Agent {
 
     // ユーザー入力を保存
     await memory.createEvent({
-      actorId: 'test',
-      sessionId: 'session2',
+      actorId: actorId,
+      sessionId: sessionId,
       text: prompt,
       role: 'USER',
     });
@@ -89,8 +96,8 @@ export class Agent {
       if (message.subtype === 'success') {
         // メモリにイベントを作成
         await memory.createEvent({
-          actorId: 'test',
-          sessionId: 'session2',
+          actorId: actorId,
+          sessionId: sessionId,
           text: message.result,
           role: 'ASSISTANT',
         });
