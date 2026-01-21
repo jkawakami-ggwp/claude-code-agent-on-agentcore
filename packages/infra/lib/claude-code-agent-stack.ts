@@ -4,6 +4,7 @@ import { Construct } from "constructs";
 import * as agentcore from "@aws-cdk/aws-bedrock-agentcore-alpha";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
+import * as iam from "aws-cdk-lib/aws-iam";
 
 interface AgentStackProps extends cdk.StackProps {
   userPool: cognito.UserPool;
@@ -49,5 +50,22 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
         AWS_AGENTCORE_MEMORY_ID: memory.memoryId,
       },
     });
+
+    // Memory へのアクセス権限を Runtime 実行ロールに付与（ListEvents/CreateEvent）
+    // これが無いと agent 側の Memory.listEvents/createEvent が 403 になる
+    const memoryArn = cdk.Stack.of(this).formatArn({
+      service: "bedrock-agentcore",
+      resource: "memory",
+      resourceName: memory.memoryId,
+    });
+
+    const memoryPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["bedrock-agentcore:ListEvents", "bedrock-agentcore:CreateEvent"],
+      resources: [memoryArn],
+    });
+
+    // Runtime.role は iam.IRole なので addToPrincipalPolicy で付与
+    runtime.role.addToPrincipalPolicy(memoryPolicy);
   }
 }
