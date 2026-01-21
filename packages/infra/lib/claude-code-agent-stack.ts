@@ -28,6 +28,13 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
       path.join(__dirname, "../../agent")
     );
 
+    // Secret ManagerからAnthropic API Keyを取得
+    const anthropicApiKey = secretsmanager.Secret.fromSecretNameV2(
+      this,
+      "ClaudeCodeAgentAnthropicApiKey",
+      "claude-code-agent/anthropic-api-key"
+    );
+
     // Runtime (Claude Code Agent)
     const runtime = new agentcore.Runtime(this, "AgentRuntime", {
       runtimeName: "ClaudeCodeAgent",
@@ -38,13 +45,8 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
         [userPoolClient],
       ),
       environmentVariables: {
-        // Secret Managerから取得
-        ANTHROPIC_API_KEY: secretsmanager.Secret.fromSecretNameV2(
-          this,
-          "ClaudeCodeAgentAnthropicApiKey",
-          "claude-code-agent/anthropic-api-key"
-        ).secretValue.unsafeUnwrap(),
-        MEMORY_ID: memory.memoryId,
+        ANTHROPIC_API_KEY: anthropicApiKey.secretValue.unsafeUnwrap(),
+        AWS_AGENTCORE_MEMORY_ID: memory.memoryId,
       },
     });
   }
