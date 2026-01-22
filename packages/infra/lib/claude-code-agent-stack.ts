@@ -21,7 +21,7 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
     const memory = new agentcore.Memory(this, "AgentMemory", {
       memoryName: "claude_code_agent_memory",
       description: "Claude Code Agent Memory",
-      expirationDuration: cdk.Duration.days(90),
+      expirationDuration: cdk.Duration.days(1),
     });
 
     // Agent Runtime Artifact (Docker ビルド)
