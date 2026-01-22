@@ -85,10 +85,16 @@ export class Agent {
     });
 
     let response = '';
+    const allowedTools = ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'WebSearch', 'WebFetch'];
     for await (const message of query({
       prompt: context,
-      options: { allowedTools: [] },
+      options: {
+        allowedTools: allowedTools,
+        settingSources: ['project'], // Claude Codeのファイルシステムベースの設定を有効化
+      },
     })) {
+      console.log('[Agent] message:', message);
+
       // 結果メッセージのみを処理
       if (message.type !== 'result') continue;
 
