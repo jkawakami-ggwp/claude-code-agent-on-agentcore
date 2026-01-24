@@ -84,14 +84,21 @@ export class Agent {
       role: 'USER',
     });
 
+    const options = {
+      allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
+      settingSources: ['project' as const], // Claude Codeのファイルシステムベースの設定を有効化
+      mcpServers: {
+        "playwright": {
+          command: "npx",
+          args: ["@playwright/mcp@latest"],
+        }
+      }
+    };
+  
     let response = '';
-    const allowedTools = ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'WebSearch', 'WebFetch'];
     for await (const message of query({
       prompt: context,
-      options: {
-        allowedTools: allowedTools,
-        settingSources: ['project'], // Claude Codeのファイルシステムベースの設定を有効化
-      },
+      options: options,
     })) {
       console.log('[Agent] message:', message);
 

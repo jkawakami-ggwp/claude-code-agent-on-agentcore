@@ -12,6 +12,9 @@ RUN mkdir -p $PNPM_HOME
 # pnpmをグローバルにインストール
 RUN npm install -g pnpm
 
+# Playwrightをインストール
+RUN pnpm add -g @playwright/mcp
+
 # Claude Codeをインストール
 RUN pnpm add -g @anthropic-ai/claude-code
 
