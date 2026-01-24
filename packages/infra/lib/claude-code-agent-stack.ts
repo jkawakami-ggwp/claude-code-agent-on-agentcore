@@ -21,7 +21,27 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
     const memory = new agentcore.Memory(this, "AgentMemory", {
       memoryName: "claude_code_agent_memory",
       description: "Claude Code Agent Memory",
-      expirationDuration: cdk.Duration.days(1),
+      expirationDuration: cdk.Duration.days(7),
+    });
+
+    // Create an S3 bucket for recordings
+    const recordingBucket = new cdk.aws_s3.Bucket(this, "AgentBrowserRecordingBucket", {
+      bucketName: `agent-browser-recordings-${this.account}`,
+      removalPolicy: cdk.RemovalPolicy.DESTROY, // For demo purposes
+    });
+
+    // Browser
+    const browser = new agentcore.BrowserCustom(this, "AgentBrowser", {
+      browserCustomName: "agent_browser",
+      description: "Agent Browser with recording enabled",
+      networkConfiguration: agentcore.BrowserNetworkConfiguration.usingPublicNetwork(),
+      recordingConfig: {
+        enabled: true,
+        s3Location: {
+          bucketName: recordingBucket.bucketName,
+          objectKey: "browser-recordings/",
+        },
+      },
     });
 
     // Agent Runtime Artifact (Docker ビルド)
@@ -48,6 +68,7 @@ export class ClaudeCodeAgentStack extends cdk.Stack {
       environmentVariables: {
         ANTHROPIC_API_KEY: anthropicApiKey.secretValue.unsafeUnwrap(),
         AWS_AGENTCORE_MEMORY_ID: memory.memoryId,
+        AWS_AGENTCORE_BROWSER_IDENTIFIER: browser.browserId,
       },
     });
 

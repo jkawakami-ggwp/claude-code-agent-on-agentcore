@@ -88,13 +88,13 @@ export class Agent {
       allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
       settingSources: ['project' as const], // Claude Codeのファイルシステムベースの設定を有効化
       mcpServers: {
-        "playwright": {
-          command: "npx",
-          args: ["@playwright/mcp@latest"],
-        }
-      }
+        playwright: {
+          command: 'npx',
+          args: ['@playwright/mcp@latest'],
+        },
+      },
     };
-  
+
     let response = '';
     for await (const message of query({
       prompt: context,
