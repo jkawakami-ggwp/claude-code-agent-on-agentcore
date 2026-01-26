@@ -11,9 +11,10 @@ services:
     ports:
       - "3000:3000"  # Next.js
       - "8080:8080"  # Agent API
+    env_file:
+      - .env
     environment:
       - NODE_ENV=development
     stdin_open: true
     tty: true
-    user: node
     working_dir: /workspace

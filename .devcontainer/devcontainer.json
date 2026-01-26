@@ -12,7 +12,7 @@
       ]
     }
   },
-  "remoteUser": "node",
+  "remoteUser": "root",
   "postCreateCommand": "pnpm all:install",
   "forwardPorts": [3000, 8080]
 }
