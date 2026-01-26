@@ -1,9 +1,7 @@
 ---
 description: コミットメッセージのフォーマットルール
-globs:
-alwaysApply: true
+alwaysApply: false
 ---
-
 # コミットメッセージのフォーマットルール
 
 ## 基本フォーマット
