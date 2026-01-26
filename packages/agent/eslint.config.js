@@ -1,7 +1,7 @@
-const tseslint = require('typescript-eslint');
-const prettier = require('eslint-config-prettier');
+import tseslint from 'typescript-eslint';
+import prettier from 'eslint-config-prettier';
 
-module.exports = [
+export default [
   {
     ignores: ['dist/**', 'node_modules/**', '*.js', '!.*.js'],
   },
